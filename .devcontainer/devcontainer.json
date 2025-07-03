@@ -1,0 +1,12 @@
+{
+  "name": "py310-cuda-faiss",
+  "image": "py310-cuda-faiss:12.1",
+  "extensions": [
+    "ms-python.python",        // run/debug codelens
+    "ms-toolsai.jupyter"       // Notebook support (optional)
+  ],
+  "settings": {
+    // tell the Python extension which interpreter to use
+    "python.defaultInterpreterPath": "/usr/bin/python"
+  }
+}
