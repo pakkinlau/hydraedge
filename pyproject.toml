@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydraedge"                       # ← unique PyPI slug
-version = "0.1.0"
+version = "0.1.2"
 description = "HydraEdge: cross-document linker (VSA × RL) – EMNLP 2025 system demo"
 readme = "README.md"
 license = { file = "LICENSE" }
-keywords = ["hydra", "cross-document", "linking", "VSA", "reinforcement-learning"]
+keywords = ["assymmetric", "cross-document", "non-isomorphic","linking", "Vector-symbolic", "reinforcement-learning"]
 authors = [
-  { name = "Pak Kin Lau", email = "pakkin.lau@link.cuhk.edu.hk" }
+  { name = "Pak Kin Lau, Stuart Michael McManus", email = "smcmanus@cuhk.edu.hk" }
 ]
 classifiers = [
   "Programming Language :: Python :: 3.10",
@@ -22,9 +22,12 @@ dependencies = [
   "uvicorn[standard]>=0.29",
   "pydantic>=2.7",
   "torch>=2.2",
-  "numpy>=1.26",
   "pytest>=8.2",
-  "structlog>=24.1"
+  "structlog>=24.1",
+  "sentence-transformers >=2.2",
+  "numpy<2",
+  "thinc<8.2.0",
+  "spacy<3.8.0",
 ]
 
 [project.urls]

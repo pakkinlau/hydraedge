@@ -1,8 +1,13 @@
-from abc import ABC, abstractmethod
-from numpy import ndarray
+# src/extractor/__init__.py
 
-class LinkerKernel(ABC):
-    @abstractmethod
-    def forward(self, vec_a: ndarray, vec_b: ndarray) -> float:
-        pass
+from sentence_transformers import SentenceTransformer
 
+# load once at import time
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+
+def extract(text: str):
+    """
+    Turn a string into a fixed-size numpy array embedding.
+    """
+    # SentenceTransformer.encode returns a numpy.ndarray
+    return embedding_model.encode(text)

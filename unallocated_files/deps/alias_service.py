@@ -21,9 +21,9 @@ from typing import Dict, Optional, Tuple
 # Optional heavy deps
 # ───────────────────────────────────────────────────────────────
 try:
-    import faiss
+    import faiss_utils
 except ImportError:
-    faiss = None                                      # Tier-2 disabled
+    faiss_utils = None                                      # Tier-2 disabled
 try:
     from sentence_transformers import SentenceTransformer
 except ImportError:
@@ -79,13 +79,13 @@ class _DocIndex:
 _KB = _KB_EMB = _KB_IDS = None
 def _lazy_load_kb():
     global _KB, _KB_EMB, _KB_IDS
-    if _KB or not faiss:
+    if _KB or not faiss_utils:
         return
     try:
         import numpy as np
         _KB_EMB = np.load(RES / "kb_emb.npy")          # (N, 384)
         _KB_IDS = (RES / "kb_ids.txt").read_text().splitlines()
-        _KB = faiss.IndexFlatIP(_KB_EMB.shape[1])
+        _KB = faiss_utils.IndexFlatIP(_KB_EMB.shape[1])
         _KB.add(_KB_EMB)
     except Exception as e:
         warnings.warn(f"[alias_service] KB load failed: {e}; Tier-2 disabled")

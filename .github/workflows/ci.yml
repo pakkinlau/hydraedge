@@ -1,3 +1,5 @@
+#  runs lint → typecheck → unit → docker build → e2e curl on every PR; cache pip & docker layers
+
 name: CI
 on: [push, pull_request]
 jobs:
@@ -11,3 +13,6 @@ jobs:
     - run: pytest -q
     - name: Build Docker
       run: docker build -t linker:test -f docker/Dockerfile .
+
+
+      
