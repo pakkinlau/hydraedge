@@ -1,0 +1,65 @@
+{
+  "version": "2.1",
+  "sentence": "I saw a white dog chase the brown cat quickly in the backyard.",
+  "nodes": [
+    { "id": "spo:see@e1",   "filler": "see",   "roles": ["Predicate"], "eid_set": ["e1"], "ntype": "spo",  "alias_key": "see" },
+    { "id": "spo:I@e1",     "filler": "I",     "roles": ["Subject"],   "eid_set": ["e1"], "ntype": "spo",  "alias_key": "i"   },
+    { "id": "evt:e2",       "filler": "e2",    "roles": ["Event"],     "eid_set": ["e2"], "ntype": "event" },
+    { "id": "spo:chase@e2", "filler": "chase", "roles": ["Predicate"], "eid_set": ["e2"], "ntype": "spo",  "alias_key": "chase" },
+    { "id": "spo:dog@e2",   "filler": "dog",   "roles": ["Subject"],   "eid_set": ["e2"], "ntype": "spo",  "alias_key": "dog" },
+    { "id": "spo:cat@e2",   "filler": "cat",   "roles": ["Object"],    "eid_set": ["e2"], "ntype": "spo",  "alias_key": "cat" },
+
+    { "id": "attr:e1:Tense:past",          "filler": "past",                "roles": ["Tense"],      "eid_set": ["e1"], "ntype": "attr" },
+    { "id": "attr:e1:Attr:white",          "filler": "white",               "roles": ["Attr"],       "eid_set": ["e1"], "ntype": "attr" },
+    { "id": "attr:e2:Tense:prespart",      "filler": "present-participle",  "roles": ["Tense"],      "eid_set": ["e2"], "ntype": "attr" },
+    { "id": "attr:e2:Attr:brown",          "filler": "brown",               "roles": ["Attr"],       "eid_set": ["e2"], "ntype": "attr" },
+    { "id": "attr:e2:Attr:quickly",        "filler": "quickly",             "roles": ["Attr"],       "eid_set": ["e2"], "ntype": "attr" },
+    { "id": "attr:e2:IndirectObject:backyard", "filler": "backyard",        "roles": ["IndirectObject"], "eid_set": ["e2"], "ntype": "attr" },
+
+    { "id": "attr:e1:Type:Person",         "filler": "Person",              "roles": ["Type"],       "eid_set": ["e1"], "ntype": "attr" },
+    { "id": "attr:e2:Type:Animal",         "filler": "Animal",              "roles": ["Type"],       "eid_set": ["e2"], "ntype": "attr" },
+
+    { "id": "attr:e1:VerbClass:51.1.1",    "filler": "verbnet:51.1.1",      "roles": ["VerbClass"],  "eid_set": ["e1"], "ntype": "attr" },
+    { "id": "attr:e2:VerbClass:51.3.2",    "filler": "verbnet:51.3.2",      "roles": ["VerbClass"],  "eid_set": ["e2"], "ntype": "attr" },
+
+    { "id": "meta:e1:Source:Book_X",       "filler": "Book_X",              "roles": ["Source"],     "eid_set": ["e1"], "ntype": "meta_out" },
+    { "id": "meta:e1:Date:2025-06-30",     "filler": "2025-06-30",          "roles": ["Date"],       "eid_set": ["e1"], "ntype": "meta_out" },
+    { "id": "meta:e2:Date:2025-07-01",     "filler": "2025-07-01",          "roles": ["Date"],       "eid_set": ["e2"], "ntype": "meta_out" },
+    { "id": "meta:e2:Venue:Park",          "filler": "Park",                "roles": ["Venue"],      "eid_set": ["e2"], "ntype": "meta_out" },
+
+    { "id": "chv:main",                    "filler": "CHV",                 "roles": ["CHV"],        "eid_set": [],    "ntype": "chv" }
+  ],
+  "edges": [
+    { "source": "attr:e1:Tense:past",            "target": "spo:see@e1",   "kind": "attr" },
+    { "source": "attr:e1:Attr:white",            "target": "spo:see@e1",   "kind": "attr" },
+    { "source": "attr:e1:VerbClass:51.1.1",      "target": "spo:see@e1",   "kind": "attr" },
+
+    { "source": "attr:e2:Tense:prespart",        "target": "spo:chase@e2", "kind": "attr" },
+    { "source": "attr:e2:Attr:brown",            "target": "spo:chase@e2", "kind": "attr" },
+    { "source": "attr:e2:Attr:quickly",          "target": "spo:chase@e2", "kind": "attr" },
+    { "source": "attr:e2:IndirectObject:backyard","target": "spo:chase@e2","kind": "attr" },
+    { "source": "attr:e2:VerbClass:51.3.2",      "target": "spo:chase@e2", "kind": "attr" },
+
+    { "source": "attr:e1:Type:Person",           "target": "spo:I@e1",     "kind": "attr" },
+    { "source": "attr:e2:Type:Animal",           "target": "spo:dog@e2",   "kind": "attr" },
+    { "source": "attr:e2:Type:Animal",           "target": "spo:cat@e2",   "kind": "attr" },
+
+    { "source": "spo:I@e1",     "target": "spo:see@e1",   "kind": "S-P" },
+    { "source": "spo:see@e1",   "target": "evt:e2",        "kind": "P-O" },
+    { "source": "spo:dog@e2",   "target": "spo:chase@e2", "kind": "S-P" },
+    { "source": "spo:chase@e2", "target": "spo:cat@e2",   "kind": "P-O" },
+    { "source": "evt:e2",       "target": "spo:dog@e2",   "kind": "event-pred" },
+
+    { "source": "meta:e1:Source:Book_X",  "target": "chv:main", "kind": "meta" },
+    { "source": "meta:e1:Date:2025-06-30","target": "chv:main", "kind": "meta" },
+    { "source": "meta:e2:Date:2025-07-01","target": "chv:main", "kind": "meta" },
+    { "source": "meta:e2:Venue:Park",     "target": "chv:main", "kind": "meta" },
+
+    { "source": "spo:cat@e2",            "target": "chv:main", "kind": "binder" }
+  ],
+  "layouts": {
+    "hulls": [
+      { "eid": "e2", "members": ["spo:dog@e2", "spo:chase@e2", "spo:cat@e2"] }
+    ]
+  }
+}
