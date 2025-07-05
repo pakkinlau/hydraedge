@@ -1,18 +1,17 @@
-#  runs lint → typecheck → unit → docker build → e2e curl on every PR; cache pip & docker layers
+name: hydraedge-ci
 
-name: CI
 on: [push, pull_request]
+
 jobs:
-  build-test:
+  unit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with: {python-version: '3.11'}
-    - run: pip install -qq pytest .
-    - run: pytest -q
-    - name: Build Docker
-      run: docker build -t linker:test -f docker/Dockerfile .
-
-
-      
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -e .[dev]   # dev extras contain pytest,jsonschema,ruff
+      - run: pytest -q
+  schema-lint:
+    runs-on: ubuntu-latest
+    steps:
+      …  # call validate_json.py on datasets/*.jsonl

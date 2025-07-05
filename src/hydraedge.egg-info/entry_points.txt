@@ -1,0 +1,4 @@
+[console_scripts]
+hydra-build-index = hydraedge.scripts.build_tiny_index:main
+hydra-seed-sample = hydraedge.scripts.seed_sample:main
+hydra-smoke = hydraedge.scripts.run_smoke:main

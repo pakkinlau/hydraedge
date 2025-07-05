@@ -41,7 +41,7 @@ IGNORE_FOLDERS: List[str] = [
     ".lake", ".github", ".git", ".qodo", ".venv", "qdrant_storage",
     "datasets", "node_modules", ".pnpm-store", ".npm", ".yarn",
     "storybook-static", "typedoc", "docs/.vitepress/dist",
-    "cdld_mixed_learning",".devcontainer", ".github", "pytest_cache", "_pycache_", "lib",
+    "cdld_mixed_learning",".devcontainer", ".github", "pytest_cache", "_pycache_", "lib","faiss"
 ]
 
 IGNORE_SYSTEM_FOLDERS: List[str] = [
@@ -58,6 +58,8 @@ IGNORE_FILE_NAMES: List[str] = [
     "yarn-error.log",
     "npm-debug.log",
     ".DS_Store",
+    "visualize_event_tuples.ipynb",
+    "old_rule_approach_rules.ipynb",
 ]
 
 # ── extension-filtering: two tiers ───────────────────────────────────────────

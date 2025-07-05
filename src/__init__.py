@@ -1,14 +1,17 @@
 """
-HydraEdge top-level namespace.
+Make `import src.serve.app` resolve to the real FastAPI app that lives in
+`hydraedge.serve.app`.
 
-Exposes:
-    • extract      – sentence-level event extractor (stub for now)
-    • encode_chain – utility used in smoke tests
+Keep this file tiny: no project logic here – just import-path aliases.
 """
-from importlib import metadata as _md                             # optional
-__version__ = "0.1.2"  # keep mypy happy
+import importlib
+import sys as _sys
 
-from .extractor import extract          # re-export
-from .model.encode_utils import encode_chain   # re-export, see § 3
+# real serving package
+_real_serve_pkg = importlib.import_module("hydraedge.serve")
 
-__all__ = ["extract", "encode_chain", "__version__"]
+# register alias modules so they import naturally
+_sys.modules[__name__ + ".serve"] = _real_serve_pkg
+_sys.modules[__name__ + ".serve.app"] = importlib.import_module(
+    "hydraedge.serve.app"
+)
