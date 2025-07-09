@@ -23,7 +23,7 @@ decorator==5.2.1
 en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.3/en_core_web_trf-3.7.3-py3-none-any.whl#sha256=f72abb34bdf174876bd4267b29b2501677e605e0a251fdc56c163003182ed68b
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85
 executing==2.2.0
-faiss==1.11.0
+# faiss==1.11.0 # REMOVE faiss from list, because it is not working in cloud computing case. And there will be fallback when no faiss.  
 fastapi==0.115.14
 fastrlock==0.8.3
 filelock==3.18.0
