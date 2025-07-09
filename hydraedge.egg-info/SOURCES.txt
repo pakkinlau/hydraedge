@@ -24,6 +24,7 @@ pyproject.toml
 ./src/hydraedge/extractor/wp1_cap_stub.py
 ./src/hydraedge/extractor/wp2_tokenise.py
 ./src/hydraedge/extractor/wp3_dependency.py
+./src/hydraedge/extractor/wp3b_vfinder.py
 ./src/hydraedge/extractor/wp4_srl.py
 ./src/hydraedge/extractor/wp5_alias.py
 ./src/hydraedge/extractor/wp6_roles.py
@@ -64,6 +65,7 @@ pyproject.toml
 ./tests/unit/extractor/test_wp1_cap_stub.py
 ./tests/unit/extractor/test_wp2_tokenise.py
 ./tests/unit/extractor/test_wp3_dependency.py
+./tests/unit/extractor/test_wp3b_vfinder.py
 ./tests/unit/extractor/test_wp4_srl.py
 ./tests/unit/extractor/test_wp5_alias_roles_rulemap.py
 ./tests/unit/extractor/test_wp8_hull.py
@@ -108,6 +110,7 @@ src/hydraedge/extractor/cli.py
 src/hydraedge/extractor/wp1_cap_stub.py
 src/hydraedge/extractor/wp2_tokenise.py
 src/hydraedge/extractor/wp3_dependency.py
+src/hydraedge/extractor/wp3b_vfinder.py
 src/hydraedge/extractor/wp4_srl.py
 src/hydraedge/extractor/wp5_alias.py
 src/hydraedge/extractor/wp6_roles.py
