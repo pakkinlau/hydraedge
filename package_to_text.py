@@ -38,17 +38,48 @@ PATTERN_IGNORE_FOLDERS: List[str] = [
 ]
 
 IGNORE_FOLDERS: List[str] = [
-    ".lake", ".github", ".git", ".qodo", ".venv", "qdrant_storage",
-    "datasets", "node_modules", ".pnpm-store", ".npm", ".yarn",
-    "storybook-static", "typedoc", "docs/.vitepress/dist",
-    "cdld_mixed_learning",".devcontainer", ".github", "pytest_cache", "_pycache_", "lib","faiss",
-    "EDA","hydraedge.egg-info", 
+    ".lake",
+    ".github",
+    ".git",
+    ".qodo",
+    ".venv",
+    "qdrant_storage",
+    "datasets",
+    "node_modules",
+    ".pnpm-store",
+    ".npm",
+    ".yarn",
+    "storybook-static",
+    "typedoc",
+    "docs/.vitepress/dist",
+    "cdld_mixed_learning",
+    ".devcontainer",
+    ".github",
+    "pytest_cache",
+    "_pycache_",
+    "lib",
+    "faiss",
+    "EDA",
+    "hydraedge.egg-info",
 ]
 
 IGNORE_SYSTEM_FOLDERS: List[str] = [
-    ".git", "__pycache__", ".astro", ".vscode", ".pnpm", ".vite", ".bin",
-    ".cache", "dist", ".next", ".svelte-kit", ".nuxt", ".turbo",
-    ".parcel-cache", ".eslintcache", "coverage",
+    ".git",
+    "__pycache__",
+    ".astro",
+    ".vscode",
+    ".pnpm",
+    ".vite",
+    ".bin",
+    ".cache",
+    "dist",
+    ".next",
+    ".svelte-kit",
+    ".nuxt",
+    ".turbo",
+    ".parcel-cache",
+    ".eslintcache",
+    "coverage",
 ]
 
 # ● lock-files and similar one-offs (skip by exact filename)
@@ -65,23 +96,56 @@ IGNORE_FILE_NAMES: List[str] = [
 
 # ── extension-filtering: two tiers ───────────────────────────────────────────
 IGNORE_EXT_FULL: List[str] = [
-    ".zip", ".tar", ".gz", ".tgz", ".7z", ".rar",
-    ".mat", ".parquet", ".db",
+    ".zip",
+    ".tar",
+    ".gz",
+    ".tgz",
+    ".7z",
+    ".rar",
+    ".mat",
+    ".parquet",
+    ".db",
 ]
 
 IGNORE_EXT_LIST_ONLY: List[str] = [
-    ".git", ".dat", ".info", ".log", ".txt", ".json", ".csv", ".geojson",
-    ".lock", ".png", ".complete", ".cfg", ".err",
-    ".ini", ".out", ".example", ".jpg", ".svg",
-    ".woff", ".woff2", ".ttf", ".otf", ".eot",
-    ".webp", ".avif", ".gif", ".ico",
-    ".jsonl", ".tsv", ".py",
+    ".git",
+    ".dat",
+    ".info",
+    ".log",
+    ".txt",
+    ".json",
+    ".csv",
+    ".geojson",
+    ".lock",
+    ".png",
+    ".complete",
+    ".cfg",
+    ".err",
+    ".ini",
+    ".out",
+    ".example",
+    ".jpg",
+    ".svg",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".otf",
+    ".eot",
+    ".webp",
+    ".avif",
+    ".gif",
+    ".ico",
+    ".jsonl",
+    ".tsv",
+    ".py",
 ]
+
 
 def _norm(ext: str) -> str:
     return ext if ext.startswith(".") else f".{ext}"
 
-IGNORE_FILE_EXTENSIONS_FULL:  Set[str] = {_norm(e).lower() for e in IGNORE_EXT_FULL}
+
+IGNORE_FILE_EXTENSIONS_FULL: Set[str] = {_norm(e).lower() for e in IGNORE_EXT_FULL}
 IGNORE_FILE_EXTENSIONS_LIST: Set[str] = {_norm(e).lower() for e in IGNORE_EXT_LIST_ONLY}
 
 # ● patterns whose *tree node* **and** *file content* are skipped
@@ -94,6 +158,7 @@ CHARS_PER_TOKEN = 4  # rough heuristic
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ╭──────────────────────── helper utils ───────────────────────╮
+
 
 def approximate_tokens(text: str) -> int:
     return len(text) // CHARS_PER_TOKEN
@@ -130,9 +195,7 @@ def should_skip_dir(dirname: str) -> bool:
     return any(pat.lower() in low for pat in PATTERN_IGNORE_FOLDERS)
 
 
-def should_skip_file(
-    fp: Path, *, exact_names: Iterable[str], context: str
-) -> bool:
+def should_skip_file(fp: Path, *, exact_names: Iterable[str], context: str) -> bool:
     if matches_skip_patterns(fp.name):
         return True
     if fp.name in exact_names:
@@ -145,7 +208,9 @@ def should_skip_file(
         return True
     return False
 
+
 # ╰─────────────────────────────────────────────────────────────╯
+
 
 def strip_notebook_outputs(path: Path) -> str:
     try:
@@ -163,6 +228,7 @@ def strip_notebook_outputs(path: Path) -> str:
 
 
 # ────────────────────────────── ASCII tree ────────────────────────────────
+
 
 def build_tree(
     path: Path,
@@ -199,9 +265,7 @@ def build_tree(
         children = sorted(path.iterdir(), key=lambda p: p.name.lower())
         for i, child in enumerate(children):
             new_prefix = prefix + (cons["space"] if is_last else cons["indent"])
-            lines.extend(
-                build_tree(child, new_prefix, i == len(children) - 1, visited)
-            )
+            lines.extend(build_tree(child, new_prefix, i == len(children) - 1, visited))
     else:
         if should_skip_file(path, exact_names=IGNORE_FILE_NAMES, context="tree"):
             return lines
@@ -211,6 +275,7 @@ def build_tree(
 
 
 # ─────────────────────────── flat listing ────────────────────────────────
+
 
 def build_flat_listing(root: Path) -> Tuple[str, Set[str], Dict[str, int]]:
     lines: List[str] = []
@@ -255,8 +320,11 @@ def build_flat_listing(root: Path) -> Tuple[str, Set[str], Dict[str, int]]:
 
 # ─────────────────────────────────── main ──────────────────────────────────
 
+
 def main() -> None:  # noqa: C901
-    p = argparse.ArgumentParser(description="Dump project tree and file contents to text")
+    p = argparse.ArgumentParser(
+        description="Dump project tree and file contents to text"
+    )
     p.add_argument("--max-tokens", type=int, default=128_000)
     args = p.parse_args()
 
@@ -268,10 +336,12 @@ def main() -> None:  # noqa: C901
     top3 = sorted(token_usage.items(), key=lambda kv: kv[1], reverse=True)[:3]
 
     output = (
-        "=== PART 1: ASCII TREE ===\n\n" + tree_text +
-        "\n\n=== END OF PART 1 ===\n\n" +
-        "=== PART 2: FILE CONTENTS ===\n\n" + flat_text +
-        "\n=== END OF PART 2 ===\n"
+        "=== PART 1: ASCII TREE ===\n\n"
+        + tree_text
+        + "\n\n=== END OF PART 1 ===\n\n"
+        + "=== PART 2: FILE CONTENTS ===\n\n"
+        + flat_text
+        + "\n=== END OF PART 2 ===\n"
     )
 
     try:
@@ -285,7 +355,7 @@ def main() -> None:  # noqa: C901
     print(f"≈ {used:,} tokens of {args.max_tokens:,} ({pct:.2f} %)")
     print(clip_msg)
     if ext_set:
-        print("File types included:", ", ".join(sorted(s.lstrip('.') for s in ext_set)))
+        print("File types included:", ", ".join(sorted(s.lstrip(".") for s in ext_set)))
     print("Top 3 files by token usage:")
     for path, toks in top3:
         print(f"  • {path} — {toks:,} tokens")
