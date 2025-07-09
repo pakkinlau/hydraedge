@@ -1,21 +1,19 @@
-# scripts/validate_json.py  (new file – lives next to build_tiny_index.py)
-import json, jsonschema, pathlib
+#!/usr/bin/env python
+# scripts/validate_json.py
 
-# minimal schema-stub; extend later if you tighten spec
-SCHEMA = {
-    "type"      : "object",
-    "required"  : ["version", "sentence", "nodes", "edges", "layouts"],
-    "properties": {
-        "version" : {"type": "string"},
-        "sentence": {"type": "string"},
-        "nodes"   : {"type": "array"},
-        "edges"   : {"type": "array"},
-        "layouts" : {"type": "object"},
-    },
-}
+import sys
+import json
 
-def check_file(path: str | pathlib.Path) -> None:
-    """Raise `jsonschema.ValidationError` if the file is invalid."""
-    with open(path, "r", encoding="utf-8") as fh:
-        doc = json.load(fh)
-    jsonschema.validate(instance=doc, schema=SCHEMA)
+def main():
+    count = 0
+    for line in sys.stdin:
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError as e:
+            print(f"INVALID JSON on line {count+1}: {e}", file=sys.stderr)
+            sys.exit(1)
+        count += 1
+    print(f"All {count} JSON lines valid.")
+
+if __name__ == "__main__":
+    main()

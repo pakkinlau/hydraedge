@@ -3,20 +3,20 @@
 test_single_sentence_srl.py — GPU-first SRL smoke-test
 Python 3.12 • no trust_remote_code • no weight warnings
 """
+# tests/smoke/test_transformer_srl.py
 from __future__ import annotations
 import re, sys
 from typing import List, Dict
-
-# ── 0 ▸ Config ────────────────────────────────────────────────────
-DEVICE = "cuda:0" if (sys.argv.count("--cpu") == 0) else "cpu"   # GPU by default
-MODEL  = "dannashao/bert-base-uncased-finetuned-srl_arg"
-SENTENCE = "I saw a white dog chase the brown cat quickly in the backyard."
-
-# ── 1 ▸ Protobuf alias (legacy libs may need it) ──────────────────
 import google.protobuf as _pb; sys.modules.setdefault("protobuf", _pb)
 
-# ── 2 ▸ Load SRL pipeline (ready-made HF head) ────────────────────
+import spacy
 from transformers import AutoTokenizer, pipeline
+
+DEVICE = "cuda:0" if "--cpu" not in sys.argv else "cpu"
+MODEL = "dannashao/bert-base-uncased-finetuned-srl_arg"
+SENTENCE = "I saw a white dog chase the brown cat quickly in the backyard."
+
+_VB = re.compile(r"^[Vv][BDGNPZ]")          # Penn verb tags
 tok = AutoTokenizer.from_pretrained(MODEL)
 srl = pipeline(
     task="token-classification",
@@ -25,39 +25,38 @@ srl = pipeline(
     aggregation_strategy="simple",
     device=DEVICE,
 )
+_nlp = spacy.load("en_core_web_sm")
 
-# ── 3 ▸ Minimal POS tagger (spaCy) to find verbs ──────────────────
-import spacy; _nlp = spacy.load("en_core_web_sm")
-_VB = re.compile(r"^[Vv][BDGNPZ]")          # Penn verb tags
 
-def verb_indices(doc) -> List[int]:
+def _verb_indices(doc) -> List[int]:
     return [i for i, tok in enumerate(doc) if _VB.match(tok.tag_)]
 
-# ── 4 ▸ Extract roles for one sentence ────────────────────────────
+
 def extract(sentence: str) -> List[Dict]:
     doc = _nlp(sentence)
-    out: List[Dict] = []
-    for i_pred in verb_indices(doc):
+    out = []
+    for i_pred in _verb_indices(doc):
         tokens = [t.text for t in doc]
-        tokens[i_pred] = "[V] " + tokens[i_pred]      # insert SRL marker
+        tokens[i_pred] = "[V] " + tokens[i_pred]
         spans = srl(" ".join(tokens))
-        for sp in spans:
-            role = sp["entity_group"]
-            if role in {"_", "B-V"}:
-                continue
-            out.append({
+        out.extend(
+            {
                 "predicate": doc[i_pred].lemma_,
-                "role"     : role,
-                "span"     : sp["word"],
-            })
+                "role": sp["entity_group"],
+                "span": sp["word"],
+            }
+            for sp in spans
+            if sp["entity_group"] not in {"_", "B-V"}
+        )
     return out
 
-# ── 5 ▸ Run & display ─────────────────────────────────────────────
-results = extract(SENTENCE)
-assert results, "No arguments extracted — check spaCy model & SRL checkpoint."
-from pprint import pprint
-pprint(results, compact=True, width=100)
-print(f"\n✓ SRL completed on {DEVICE}.  {len(results)} argument spans found.")
+
+# ---------- PyTest entry point ----------
+def test_single_sentence_srl():
+    """Smoke-test that at least one semantic role is extracted."""
+    results = extract(SENTENCE)
+    assert results, "No arguments extracted — check spaCy model & SRL checkpoint."
+
 
 """ 
 Output:

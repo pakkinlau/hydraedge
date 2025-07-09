@@ -1,19 +1,29 @@
-#!/usr/bin/env python3
-import faiss_utils, json, numpy as np, sys, pathlib
-from src.extractor import extract
-from src.model.cosine_kernel import CosineKernel
+#!/usr/bin/env python
+# scripts/build_tiny_index.py
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-TXT  = ROOT / "data" / "sample" / "toy_docs.txt"
-IDX  = ROOT / "data" / "sample" / "toy_index.faiss"
+import argparse
+import json
+import numpy as np
+from hydraedge.index.faiss_index import FaissIndex
 
-vecs = []
-with TXT.open() as fh:
-    for ln in fh:
-        tuples = extract(ln.rstrip())
-        vecs.append(np.random.randint(0, 2, 4096).astype("float32"))  # stub
-mat = np.vstack(vecs)
-index = faiss_utils.IndexFlatIP(mat.shape[1])
-index.add(mat)
-faiss_utils.write_index(index, str(IDX))
-print(f"✅  tiny index written: {IDX} ({index.ntotal} vecs)")
+def main():
+    p = argparse.ArgumentParser(__doc__)
+    p.add_argument("--input", required=True,
+                   help="JSONL of vectors: [{id: str, vector: [floats]}, …]")
+    p.add_argument("--output", required=True,
+                   help="Path to write the FAISS index")
+    args = p.parse_args()
+
+    # load
+    entries = [json.loads(line) for line in open(args.input, "r")]
+    xb = np.stack([e["vector"] for e in entries]).astype("float32")
+    ids = [e["id"] for e in entries]
+
+    # build & save
+    idx = FaissIndex(dim=xb.shape[1], metric="cosine")
+    idx.add(xb, ids)
+    idx.save(args.output)
+    print(f"Built index with {len(ids)} vectors → {args.output}")
+
+if __name__ == "__main__":
+    main()

@@ -1,31 +1,13 @@
 """
-hydraedge.extractor (lightweight façade)
-=======================================
+hydraedge.extractor
+~~~~~~~~~~~~~~~~~~~
+Deterministic tuple-extraction pipeline (§ 1.2).
 
-❱  *Keeps unit-tests & CI green* by **avoiding heavyweight imports** at
-module-import time.  Nothing from HuggingFace / Torch / torchvision is
-touched until you explicitly *ask* for SRL or CHV encoding.
-
-The public surface remains::
-
-    >>> from hydraedge.extractor import sentence_to_payload
+Usage
+-----
+>>> from hydraedge.extractor import extract_sentence
+>>> payload = extract_sentence("In 2006 Google acquired YouTube for $1.65 billion.")
+>>> print(payload["version"])      # '2.4'
 """
-
-from importlib import import_module
-from types     import ModuleType
-from typing    import Any, Callable
-
-from .api import extract  
-
-__all__ = ["sentence_to_payload"]
-
-
-# -- lazy proxy --------------------------------------------------------------
-def _api() -> ModuleType:                        # never cached in globals()
-    return import_module(".api",  package=__name__)
-
-
-def __getattr__(name: str) -> Any:               # PEP-562 dynamic attribute
-    if name in __all__:
-        return getattr(_api(), name)
-    raise AttributeError(name)
+from .cli import extract_sentence, extract_doc
+__all__ = ["extract_sentence", "extract_doc"]
