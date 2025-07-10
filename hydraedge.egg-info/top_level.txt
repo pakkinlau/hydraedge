@@ -10,4 +10,5 @@ notebooks
 scripts
 src
 tests
+third_party
 unallocated_files

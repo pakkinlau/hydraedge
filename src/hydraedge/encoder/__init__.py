@@ -1,32 +1,51 @@
-# src/hydraedge/encoder/__init__.py
-
+# ────────────────────────────────────────────────────────────────────────────────
+# HydraEdge · encoder package initialiser (lazy-load variant)
+# Save as: src/hydraedge/encoder/__init__.py
+# -------------------------------------------------------------------------------
 """
-HydraEdge encoder façade.
+HydraEdge encoder namespace.
 
-This module exposes only a single function:
-    encode_sentence(tuples: Sequence[Tuple[str, str]]) -> np.ndarray
+We deliberately **avoid eager imports** to prevent circular-initialisation
+problems (e.g. chv_math → encoder → chv_math).  Sub-modules are exposed
+lazily via ``__getattr__`` the first time they are accessed.
 
-Internals (role/filler initialization, JL projection, binding, bundling)
-live in private submodules under ._impl.
+Public API
+----------
+encoder.chv_math
+encoder.chv_encoder
+encoder.ep0_pre_check
+# + any future encoder.* modules listed in ``_LAZY_EXPORTS``
+
+Example
+-------
+>>> from hydraedge.encoder import chv_math
+>>> chv_math.dot_sign(...)
 """
 
-from typing import Sequence, Tuple
-import numpy as np
+from importlib import import_module
+import sys
+from types import ModuleType
+from typing import Final
 
-from . import chv_math 
-from .chv_encoder import encode, unbind, ROLE_VECS 
-from .chv_encoder import encode_chv   # ← rename if you want
+__all__ = [
+    "chv_math",
+    "chv_encoder",
+    "ep0_pre_check",
+]
 
-__all__ = ["encode_sentence"]
+_LAZY_EXPORTS: Final[set[str]] = set(__all__)
 
-def encode_sentence(tuples: Sequence[Tuple[str, str]]) -> np.ndarray:
-    """
-    Encode a list of (role, filler) pairs into a composite CHV.
 
-    Args:
-        tuples: Iterable of (role_name, filler_token) pairs.
+def __getattr__(name: str) -> ModuleType:  # noqa: D401, N802
+    """Dynamically import *encoder.name* on first access."""
+    if name in _LAZY_EXPORTS:
+        full_name = f"{__name__}.{name}"
+        mod = import_module(full_name)
+        sys.modules[full_name] = mod
+        return mod
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
-    Returns:
-        A 1-D numpy array of dtype int8 with values in {-1, +1}, of length D.
-    """
-    return encode_chv(tuples)
+
+def __dir__() -> list[str]:  # noqa: D401
+    """Allow static analysers / `dir()` to discover lazy exports."""
+    return sorted(list(globals().keys()) + list(_LAZY_EXPORTS))

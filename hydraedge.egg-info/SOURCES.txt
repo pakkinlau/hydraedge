@@ -14,23 +14,33 @@ pyproject.toml
 ./src/hydraedge/__init__.py
 ./src/hydraedge/common/logger.py
 ./src/hydraedge/encoder/__init__.py
-./src/hydraedge/encoder/chv.py
-./src/hydraedge/encoder/chv_encoder.py
-./src/hydraedge/encoder/chv_math.py
-./src/hydraedge/encoder/jl_project.py
-./src/hydraedge/encoder/role_vectors.py
-./src/hydraedge/extractor/__init__.py
-./src/hydraedge/extractor/cli.py
-./src/hydraedge/extractor/wp1_cap_stub.py
-./src/hydraedge/extractor/wp2_tokenise.py
-./src/hydraedge/extractor/wp3_dependency.py
-./src/hydraedge/extractor/wp3b_vfinder.py
-./src/hydraedge/extractor/wp4_srl.py
-./src/hydraedge/extractor/wp5_alias.py
-./src/hydraedge/extractor/wp6_roles.py
-./src/hydraedge/extractor/wp7_rulemap.py
-./src/hydraedge/extractor/wp8_hull.py
-./src/hydraedge/extractor/wp9_post.py
+./src/hydraedge/encoder/ep0_pre_check.py
+./src/hydraedge/encoder/ep10_faiss_sink.py
+./src/hydraedge/encoder/ep1_alias_norm.py
+./src/hydraedge/encoder/ep2_w2hv_embed.py
+./src/hydraedge/encoder/ep3_role_lookup.py
+./src/hydraedge/encoder/ep4_dir_tag.py
+./src/hydraedge/encoder/ep5_gamma_gate.py
+./src/hydraedge/encoder/ep6_bundle.py
+./src/hydraedge/encoder/ep7_delimiter.py
+./src/hydraedge/encoder/ep8_sign_post.py
+./src/hydraedge/encoder/ep9_qc_digest.py
+./src/hydraedge/encoder/w2hv_backend.py
+./src/hydraedge/extractor (up to wp5)/__init__.py
+./src/hydraedge/extractor (up to wp5)/base.py
+./src/hydraedge/extractor (up to wp5)/cli.py
+./src/hydraedge/extractor (up to wp5)/pipeline.py
+./src/hydraedge/extractor (up to wp5)/wp1_cap_stub.py
+./src/hydraedge/extractor (up to wp5)/wp2_tokenise.py
+./src/hydraedge/extractor (up to wp5)/wp3_dependency.py
+./src/hydraedge/extractor (up to wp5)/wp3b_vfinder.py
+./src/hydraedge/extractor (up to wp5)/wp4_srl.py
+./src/hydraedge/extractor (up to wp5)/wp4_srl_gpu.py
+./src/hydraedge/extractor (up to wp5)/wp5_alias.py
+./src/hydraedge/extractor (up to wp5)/wp6_roles.py
+./src/hydraedge/extractor (up to wp5)/wp7_rulemap.py
+./src/hydraedge/extractor (up to wp5)/wp8_hull.py
+./src/hydraedge/extractor (up to wp5)/wp9_post.py
 ./src/hydraedge/index/__init__.py
 ./src/hydraedge/index/faiss_index.py
 ./src/hydraedge/kernel/bind_ops.py
@@ -49,32 +59,18 @@ pyproject.toml
 ./src/hydraedge/serve/app.py
 ./src/hydraedge/train/__init__.py
 ./src/hydraedge/train/train.py
-./tests/smoke/build_tiny_index.py
-./tests/smoke/test_cupy.py
-./tests/smoke/test_encode_chain.py
-./tests/smoke/test_extract.py
-./tests/smoke/test_faiss.py
-./tests/smoke/test_import_all.py
-./tests/smoke/test_kernel_forward.py
-./tests/smoke/test_route_link.py
-./tests/smoke/test_torch.py
-./tests/smoke/test_transformer_srl.py
-./tests/unit/encoder/test_chv_math.py
+./tests/unit/encoder/test_ep0_pre_check.py
 ./tests/unit/extractor/conftest.py
 ./tests/unit/extractor/test_end2end.py
+./tests/unit/extractor/test_vfinder.py
 ./tests/unit/extractor/test_wp1_cap_stub.py
 ./tests/unit/extractor/test_wp2_tokenise.py
 ./tests/unit/extractor/test_wp3_dependency.py
 ./tests/unit/extractor/test_wp3b_vfinder.py
 ./tests/unit/extractor/test_wp4_srl.py
-./tests/unit/extractor/test_wp5_alias_roles_rulemap.py
+./tests/unit/extractor/test_wp5_alias.py
+./tests/unit/extractor/test_wp6_roles.py
 ./tests/unit/extractor/test_wp8_hull.py
-./tests/unit/math/test_binding.py
-./tests/unit/math/test_gamma_gate.py
-./tests/unit/math/test_jl_cosine.py
-./tests/unit/math/test_majority_vote.py
-./tests/unit/math/test_nesting.py
-./tests/unit/math/test_roles.py
 ./unallocated_files/old_deps/alias_service.py
 ./unallocated_files/old_deps/deepinfra_client.py
 ./unallocated_files/old_deps/edge_type_service.py
@@ -100,23 +96,33 @@ src/__init__.py
 src/hydraedge/__init__.py
 src/hydraedge/common/logger.py
 src/hydraedge/encoder/__init__.py
-src/hydraedge/encoder/chv.py
-src/hydraedge/encoder/chv_encoder.py
-src/hydraedge/encoder/chv_math.py
-src/hydraedge/encoder/jl_project.py
-src/hydraedge/encoder/role_vectors.py
-src/hydraedge/extractor/__init__.py
-src/hydraedge/extractor/cli.py
-src/hydraedge/extractor/wp1_cap_stub.py
-src/hydraedge/extractor/wp2_tokenise.py
-src/hydraedge/extractor/wp3_dependency.py
-src/hydraedge/extractor/wp3b_vfinder.py
-src/hydraedge/extractor/wp4_srl.py
-src/hydraedge/extractor/wp5_alias.py
-src/hydraedge/extractor/wp6_roles.py
-src/hydraedge/extractor/wp7_rulemap.py
-src/hydraedge/extractor/wp8_hull.py
-src/hydraedge/extractor/wp9_post.py
+src/hydraedge/encoder/ep0_pre_check.py
+src/hydraedge/encoder/ep10_faiss_sink.py
+src/hydraedge/encoder/ep1_alias_norm.py
+src/hydraedge/encoder/ep2_w2hv_embed.py
+src/hydraedge/encoder/ep3_role_lookup.py
+src/hydraedge/encoder/ep4_dir_tag.py
+src/hydraedge/encoder/ep5_gamma_gate.py
+src/hydraedge/encoder/ep6_bundle.py
+src/hydraedge/encoder/ep7_delimiter.py
+src/hydraedge/encoder/ep8_sign_post.py
+src/hydraedge/encoder/ep9_qc_digest.py
+src/hydraedge/encoder/w2hv_backend.py
+src/hydraedge/extractor (up to wp5)/__init__.py
+src/hydraedge/extractor (up to wp5)/base.py
+src/hydraedge/extractor (up to wp5)/cli.py
+src/hydraedge/extractor (up to wp5)/pipeline.py
+src/hydraedge/extractor (up to wp5)/wp1_cap_stub.py
+src/hydraedge/extractor (up to wp5)/wp2_tokenise.py
+src/hydraedge/extractor (up to wp5)/wp3_dependency.py
+src/hydraedge/extractor (up to wp5)/wp3b_vfinder.py
+src/hydraedge/extractor (up to wp5)/wp4_srl.py
+src/hydraedge/extractor (up to wp5)/wp4_srl_gpu.py
+src/hydraedge/extractor (up to wp5)/wp5_alias.py
+src/hydraedge/extractor (up to wp5)/wp6_roles.py
+src/hydraedge/extractor (up to wp5)/wp7_rulemap.py
+src/hydraedge/extractor (up to wp5)/wp8_hull.py
+src/hydraedge/extractor (up to wp5)/wp9_post.py
 src/hydraedge/index/__init__.py
 src/hydraedge/index/faiss_index.py
 src/hydraedge/kernel/bind_ops.py
@@ -135,31 +141,16 @@ src/hydraedge/scripts/seed_sample.py
 src/hydraedge/serve/app.py
 src/hydraedge/train/__init__.py
 src/hydraedge/train/train.py
-tests/smoke/build_tiny_index.py
-tests/smoke/test_cupy.py
-tests/smoke/test_encode_chain.py
-tests/smoke/test_extract.py
-tests/smoke/test_faiss.py
-tests/smoke/test_import_all.py
-tests/smoke/test_kernel_forward.py
-tests/smoke/test_route_link.py
-tests/smoke/test_torch.py
-tests/smoke/test_transformer_srl.py
-tests/unit/encoder/test_chv_math.py
 tests/unit/extractor/conftest.py
 tests/unit/extractor/test_end2end.py
+tests/unit/extractor/test_vfinder.py
 tests/unit/extractor/test_wp1_cap_stub.py
 tests/unit/extractor/test_wp2_tokenise.py
 tests/unit/extractor/test_wp3_dependency.py
+tests/unit/extractor/test_wp3b_vfinder.py
 tests/unit/extractor/test_wp4_srl.py
-tests/unit/extractor/test_wp5_alias_roles_rulemap.py
+tests/unit/extractor/test_wp5_alias.py
 tests/unit/extractor/test_wp8_hull.py
-tests/unit/math/test_binding.py
-tests/unit/math/test_gamma_gate.py
-tests/unit/math/test_jl_cosine.py
-tests/unit/math/test_majority_vote.py
-tests/unit/math/test_nesting.py
-tests/unit/math/test_roles.py
 unallocated_files/old_deps/alias_service.py
 unallocated_files/old_deps/deepinfra_client.py
 unallocated_files/old_deps/edge_type_service.py

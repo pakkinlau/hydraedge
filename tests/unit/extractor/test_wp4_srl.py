@@ -1,7 +1,20 @@
-def test_srl_shapes(tokens, srl_frames):
-    assert srl_frames, "SRL found no frames"
-    for frame in srl_frames:
-        assert len(frame["words"]) == len(tokens)
-        assert len(frame["tags"])  == len(tokens)
-        vi = frame["verb_index"]
-        assert frame["tags"][vi] == "B-V"
+from hydraedge.extractor import wp1_cap_stub, wp4_srl
+
+
+def _run(s):
+    cap = wp1_cap_stub.run("d", 0, s)
+    return wp4_srl.run("d", 0, cap["cap"])
+
+
+def test_pred_double():
+    res = _run("John eats and sleeps.")
+    assert len(res["predicates"]) >= 2
+
+def test_roles_present():
+    res = _run("Mary gave John a gift.")
+    roles = res["roles"][0]
+    assert "ARG0" in roles and "ARG1" in roles
+
+def test_no_verb_empty():
+    res = _run("Beautiful flowers in the garden.")
+    assert res["predicates"] == [] and res["roles"] == []

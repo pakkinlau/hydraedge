@@ -1,19 +1,27 @@
-# tests/unit/extractor/test_wp2_tokenise.py
+from hydraedge.extractor import wp1_cap_stub, wp2_tokenise
 
-def test_tokenise_roundtrip(cap_result, tokens):
-    import re
 
-    txt   = cap_result["text"]
-    recon = " ".join(tok for tok, *_ in tokens)
+def _prep(sentence: str):
+    cap = wp1_cap_stub.run("docT", 0, sentence, cap_len=64)
+    return wp2_tokenise.run("docT", 0, cap["cap"])
 
-    # First collapse spaces before punctuation (e.g., "billion ." → "billion.")
-    # Then collapse spaces after dollar signs (e.g., "$ 1.65" → "$1.65")
-    def norm(s: str) -> str:
-        s = re.sub(r"\s+([.,])", r"\1", s)
-        s = re.sub(r"\$\s+", "$", s)
-        return s
 
-    assert norm(recon) == txt
+def test_lengths_match():
+    res = _prep("The quick brown fox jumps over the lazy dog.")
+    n = len(res["tokens"])
+    assert all(len(res[k]) == n for k in ("lemmas", "pos", "spans"))
 
-    # Ensure we still got (token, POS, idx) triples
-    assert all(isinstance(t, tuple) and len(t) == 3 for t in tokens)
+
+def test_roundtrip():
+    sent = "SpaCy splits punctuation correctly, e.g., 'hello!'"
+    res = _prep(sent)
+    recon = " ".join(res["tokens"])
+    # Remove double-spaces generated around punct by join
+    assert recon.replace(" ", "") == sent.replace(" ", "")
+
+
+def test_cap_boundary():
+    long = " ".join(f"t{i}" for i in range(100))
+    cap = wp1_cap_stub.run("docT", 1, long, cap_len=64)
+    res = wp2_tokenise.run("docT", 1, cap["cap"])
+    assert len(res["tokens"]) <= 64

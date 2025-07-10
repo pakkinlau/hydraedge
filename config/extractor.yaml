@@ -1,0 +1,16 @@
+# config/extractor.yaml
+order:
+  - cap_stub
+  - tokenise
+  - dependency
+  - verb_finder       # new stage
+  - srl               # may be skipped by gate
+  - alias
+  - roles
+  - rulemap
+  - hull
+  - post
+cap_len: 64
+srl:
+  enable_gate: true
+  provider: "gpu"

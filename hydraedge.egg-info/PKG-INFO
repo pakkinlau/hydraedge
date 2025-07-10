@@ -23,6 +23,7 @@ Requires-Dist: pydantic>=2.7.0
 Requires-Dist: starlette>=0.37.2
 Requires-Dist: httpx>=0.27.0
 Requires-Dist: jsonschema>=4.22.0
+Requires-Dist: pycountry>=23.12.11
 Dynamic: license-file
 
 # HyDRA-Edge Rapid-Startup Environment
