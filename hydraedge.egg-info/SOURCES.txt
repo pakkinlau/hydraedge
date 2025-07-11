@@ -1,93 +1,12 @@
 LICENSE
 README.md
 pyproject.toml
-./notebooks/EDA/nested_event_vis.py
-./notebooks/EDA/nested_event_vis_pyvis.py
-./notebooks/EDA/nested_event_vis_pyvis_batch5.py
-./notebooks/EDA/nested_event_vis_pyvis_batch5b.py
-./notebooks/EDA/nested_event_vis_pyvis_batch5c.py
-./scripts/build_tiny_index.py
-./scripts/encode.py
-./scripts/seed_sample.py
-./scripts/validate_json.py
-./src/__init__.py
-./src/hydraedge/__init__.py
-./src/hydraedge/common/logger.py
-./src/hydraedge/encoder/__init__.py
-./src/hydraedge/encoder/ep0_pre_check.py
-./src/hydraedge/encoder/ep10_faiss_sink.py
-./src/hydraedge/encoder/ep1_alias_norm.py
-./src/hydraedge/encoder/ep2_w2hv_embed.py
-./src/hydraedge/encoder/ep3_role_lookup.py
-./src/hydraedge/encoder/ep4_dir_tag.py
-./src/hydraedge/encoder/ep5_gamma_gate.py
-./src/hydraedge/encoder/ep6_bundle.py
-./src/hydraedge/encoder/ep7_delimiter.py
-./src/hydraedge/encoder/ep8_sign_post.py
-./src/hydraedge/encoder/ep9_qc_digest.py
-./src/hydraedge/encoder/w2hv_backend.py
-./src/hydraedge/extractor (up to wp5)/__init__.py
-./src/hydraedge/extractor (up to wp5)/base.py
-./src/hydraedge/extractor (up to wp5)/cli.py
-./src/hydraedge/extractor (up to wp5)/pipeline.py
-./src/hydraedge/extractor (up to wp5)/wp1_cap_stub.py
-./src/hydraedge/extractor (up to wp5)/wp2_tokenise.py
-./src/hydraedge/extractor (up to wp5)/wp3_dependency.py
-./src/hydraedge/extractor (up to wp5)/wp3b_vfinder.py
-./src/hydraedge/extractor (up to wp5)/wp4_srl.py
-./src/hydraedge/extractor (up to wp5)/wp4_srl_gpu.py
-./src/hydraedge/extractor (up to wp5)/wp5_alias.py
-./src/hydraedge/extractor (up to wp5)/wp6_roles.py
-./src/hydraedge/extractor (up to wp5)/wp7_rulemap.py
-./src/hydraedge/extractor (up to wp5)/wp8_hull.py
-./src/hydraedge/extractor (up to wp5)/wp9_post.py
-./src/hydraedge/index/__init__.py
-./src/hydraedge/index/faiss_index.py
-./src/hydraedge/kernel/bind_ops.py
-./src/hydraedge/kernel/bundles.py
-./src/hydraedge/kernel/checks.py
-./src/hydraedge/kernel/jl.py
-./src/hydraedge/pair_data_manager/__init__.py
-./src/hydraedge/pair_data_manager/dataset.py
-./src/hydraedge/pair_data_manager/pairing.py
-./src/hydraedge/rl/__init__.py
-./src/hydraedge/rl/agent.py
-./src/hydraedge/scripts/build_tiny_index.py
-./src/hydraedge/scripts/encode.py
-./src/hydraedge/scripts/run_smoke.py
-./src/hydraedge/scripts/seed_sample.py
-./src/hydraedge/serve/app.py
-./src/hydraedge/train/__init__.py
-./src/hydraedge/train/train.py
-./tests/unit/encoder/test_ep0_pre_check.py
-./tests/unit/extractor/conftest.py
-./tests/unit/extractor/test_end2end.py
-./tests/unit/extractor/test_vfinder.py
-./tests/unit/extractor/test_wp1_cap_stub.py
-./tests/unit/extractor/test_wp2_tokenise.py
-./tests/unit/extractor/test_wp3_dependency.py
-./tests/unit/extractor/test_wp3b_vfinder.py
-./tests/unit/extractor/test_wp4_srl.py
-./tests/unit/extractor/test_wp5_alias.py
-./tests/unit/extractor/test_wp6_roles.py
-./tests/unit/extractor/test_wp8_hull.py
-./unallocated_files/old_deps/alias_service.py
-./unallocated_files/old_deps/deepinfra_client.py
-./unallocated_files/old_deps/edge_type_service.py
-./unallocated_files/old_deps/graph_store.py
-./unallocated_files/old_files/extractors (LLM approach)/edge_extractor.py
-./unallocated_files/old_files/extractors (LLM approach)/triple_extractor.py
 hydraedge.egg-info/PKG-INFO
 hydraedge.egg-info/SOURCES.txt
 hydraedge.egg-info/dependency_links.txt
 hydraedge.egg-info/entry_points.txt
 hydraedge.egg-info/requires.txt
 hydraedge.egg-info/top_level.txt
-notebooks/EDA/nested_event_vis.py
-notebooks/EDA/nested_event_vis_pyvis.py
-notebooks/EDA/nested_event_vis_pyvis_batch5.py
-notebooks/EDA/nested_event_vis_pyvis_batch5b.py
-notebooks/EDA/nested_event_vis_pyvis_batch5c.py
 scripts/build_tiny_index.py
 scripts/encode.py
 scripts/seed_sample.py
@@ -97,6 +16,7 @@ src/hydraedge/__init__.py
 src/hydraedge/common/logger.py
 src/hydraedge/encoder/__init__.py
 src/hydraedge/encoder/ep0_pre_check.py
+src/hydraedge/encoder/ep0b_data_typle_check.py
 src/hydraedge/encoder/ep10_faiss_sink.py
 src/hydraedge/encoder/ep1_alias_norm.py
 src/hydraedge/encoder/ep2_w2hv_embed.py
@@ -134,6 +54,7 @@ src/hydraedge/pair_data_manager/dataset.py
 src/hydraedge/pair_data_manager/pairing.py
 src/hydraedge/rl/__init__.py
 src/hydraedge/rl/agent.py
+src/hydraedge/schema/__init__.py
 src/hydraedge/scripts/build_tiny_index.py
 src/hydraedge/scripts/encode.py
 src/hydraedge/scripts/run_smoke.py
@@ -141,6 +62,9 @@ src/hydraedge/scripts/seed_sample.py
 src/hydraedge/serve/app.py
 src/hydraedge/train/__init__.py
 src/hydraedge/train/train.py
+src/hydraedge/viz/ep_0_nested_event_vis.py
+tests/unit/encoder/test_ep0_pre_check.py
+tests/unit/encoder/test_ep0b_data_typle_check.py
 tests/unit/extractor/conftest.py
 tests/unit/extractor/test_end2end.py
 tests/unit/extractor/test_vfinder.py
@@ -150,6 +74,7 @@ tests/unit/extractor/test_wp3_dependency.py
 tests/unit/extractor/test_wp3b_vfinder.py
 tests/unit/extractor/test_wp4_srl.py
 tests/unit/extractor/test_wp5_alias.py
+tests/unit/extractor/test_wp6_roles.py
 tests/unit/extractor/test_wp8_hull.py
 unallocated_files/old_deps/alias_service.py
 unallocated_files/old_deps/deepinfra_client.py

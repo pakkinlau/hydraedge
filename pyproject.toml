@@ -40,6 +40,7 @@ package-dir = { "" = "." }
 # still pick up everything under src/ *and* the repo root
 [tool.setuptools.packages.find]
 where = ["src", "."]
+include = ["hydraedge", "hydraedge.*"]
 
 [project.scripts]
 hydra-build-index = "hydraedge.scripts.build_tiny_index:main"
@@ -50,3 +51,6 @@ hydra-encode      = "hydraedge.scripts.encode:main"
 [project.urls]
 Homepage   = "https://github.com/pakkinlau/hydraedge"
 Repository = "https://github.com/pakkinlau/hydraedge.git"
+
+[tool.setuptools.package-data]
+"hydraedge.datasets" = ["**/*"] 

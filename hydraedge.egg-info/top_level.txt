@@ -1,14 +1,1 @@
-config
-data
-dist
-dockerfile
-docs
-env
 hydraedge
-lib
-notebooks
-scripts
-src
-tests
-third_party
-unallocated_files
