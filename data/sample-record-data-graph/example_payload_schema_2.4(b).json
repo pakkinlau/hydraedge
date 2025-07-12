@@ -1,0 +1,55 @@
+{
+  "version": "2.4",
+  "sentence": "While the committee debated the proposed amendments late into the night, a coalition of independent experts published a comprehensive white paper highlighting both the strengths and the potential risks of the new regulatory framework.",
+  "nodes": [
+    { "id": "n1",  "ntype": "spo", "filler": "committee", "roles": ["SUBJ"], "eid_set": ["e1"], "span": [10, 19],  "alias_key": "committee" },
+    { "id": "n2",  "ntype": "spo", "filler": "debated",   "roles": ["PRED"], "eid_set": ["e1"], "span": [20, 27],  "alias_key": "debate" },
+    { "id": "n3",  "ntype": "spo", "filler": "proposed amendments", "roles": ["OBJ"],  "eid_set": ["e1"], "span": [32, 51],  "alias_key": "amendment" },
+
+    { "id": "n4",  "ntype": "spo", "filler": "coalition of independent experts", "roles": ["SUBJ"], "eid_set": ["e2"], "span": [75, 107], "alias_key": "coalition_experts" },
+    { "id": "n5",  "ntype": "spo", "filler": "published", "roles": ["PRED"], "eid_set": ["e2"], "span": [108, 117], "alias_key": "publish" },
+    { "id": "n6",  "ntype": "spo", "filler": "white paper", "roles": ["OBJ"], "eid_set": ["e2","e3"], "span": [134, 145], "alias_key": "white_paper" },
+
+    { "id": "n7",  "ntype": "spo", "filler": "highlighting", "roles": ["PRED"], "eid_set": ["e3"], "span": [146, 158], "alias_key": "highlight" },
+    { "id": "n8",  "ntype": "spo", "filler": "strengths and potential risks", "roles": ["OBJ"], "eid_set": ["e3"], "span": [168, 201], "alias_key": "strengths_risks" },
+
+    { "id": "evt1", "ntype": "event", "eid": "e1" },
+    { "id": "evt2", "ntype": "event", "eid": "e2" },
+    { "id": "evt3", "ntype": "event", "eid": "e3" },
+
+    { "id": "meta1", "ntype": "meta_out", "filler": "night", "doc_id": "doc-001" },
+    { "id": "chv1",  "ntype": "chv", "vector_key": "main", "doc_id": "doc-001", "sent_id": "s-01" }
+  ],
+
+  "edges": [
+    { "id": "e01", "kind": "S-P",        "source": "n1",   "target": "n2" },
+    { "id": "e02", "kind": "P-O",        "source": "n2",   "target": "n3" },
+    { "id": "e03", "kind": "event-pred", "source": "evt1", "target": "n1" },
+
+    { "id": "e04", "kind": "S-P",        "source": "n4",   "target": "n5" },
+    { "id": "e05", "kind": "P-O",        "source": "n5",   "target": "n6" },
+    { "id": "e06", "kind": "event-pred", "source": "evt2", "target": "n4" },
+
+    { "id": "e07", "kind": "S-P",        "source": "n6",   "target": "n7" },
+    { "id": "e08", "kind": "P-O",        "source": "n7",   "target": "n8" },
+    { "id": "e09", "kind": "event-pred", "source": "evt3", "target": "n6" },
+
+    { "id": "e10", "kind": "binder",     "source": "n8",   "target": "chv1" },
+    { "id": "e11", "kind": "meta",       "source": "meta1","target": "chv1" }
+  ],
+
+  "layouts": {
+    "hulls": [
+      { "eid": "e1", "members": ["n1","n2","n3"], "children": [] },
+
+      { "eid": "e3", "members": ["n6","n7","n8"], "children": [] },
+
+      { "eid": "e2",
+        "members": ["n4","n5","n6"],
+        "children": [
+          { "eid": "e3", "members": ["n6","n7","n8"], "children": [] }
+        ]
+      }
+    ]
+  }
+}

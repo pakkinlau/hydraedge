@@ -55,6 +55,8 @@ src/hydraedge/pair_data_manager/pairing.py
 src/hydraedge/rl/__init__.py
 src/hydraedge/rl/agent.py
 src/hydraedge/schema/__init__.py
+src/hydraedge/schema/payload_schema.py
+src/hydraedge/schema/validator.py
 src/hydraedge/scripts/build_tiny_index.py
 src/hydraedge/scripts/encode.py
 src/hydraedge/scripts/run_smoke.py

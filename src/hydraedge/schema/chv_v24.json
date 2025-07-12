@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nested-event CHV graph",
+  "type": "object",
+  "required": ["version", "sentence", "nodes", "edges"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Payload version, e.g. \"2.4\" or \"2.4(b)\""
+    },
+    "sentence": {
+      "type": "string",
+      "description": "Original input sentence"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "filler", "roles", "eid_set", "ntype"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique node identifier"
+          },
+          "filler": {
+            "type": "string",
+            "description": "Text span or value"
+          },
+          "alias_key": {
+            "type": "string",
+            "description": "Normalized alias (optional)"
+          },
+          "roles": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Semantic roles (e.g. Subject, Object, Predicate, Attr, Tense, etc.)"
+          },
+          "eid_set": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Event IDs this node participates in"
+          },
+          "ntype": {
+            "type": "string",
+            "enum": ["spo", "attr", "meta_out", "chv", "event"],
+            "description": "Node type"
+          },
+          "char_start": {
+            "type": "integer",
+            "description": "Character start index (or -1 if not in text)"
+          },
+          "char_end": {
+            "type": "integer",
+            "description": "Character end index (or -1 if not in text)"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "target", "kind"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "ID of the source node"
+          },
+          "target": {
+            "type": "string",
+            "description": "ID of the target node"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["S-P", "P-O", "attr", "meta", "binder", "event-pred", "subevt"],
+            "description": "Edge type"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "layouts": {
+      "type": "object",
+      "properties": {
+        "hulls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["members"],
+            "properties": {
+              "eid": {
+                "type": "string",
+                "description": "Event ID for this hull"
+              },
+              "members": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Node IDs grouped into this hull"
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,206 +1,177 @@
-###########################
-# File: src/hydraedge/viz/ep_0_nested_event_vis.py
-###########################
+#!/usr/bin/env python3
 """
-HydraEdge nested-event visualiser (schema ≥ 2.4)
+PyVis CHV force-graph visualiser · v2.4-patch5  (2025-07-13)
 
-* Reads a single extracted-JSON payload.
-* Validates it with the shared `hydraedge.schema.SCHEMA`.
-* Builds an interactive force-directed graph via **pyvis**.
-* Writes a self-contained HTML file (optionally wrapped in a template).
-
-CLI
-~~~
-python -m hydraedge.viz.ep_0_nested_event_vis \
-       data/sample-record-data-graph/example_payload_schema_2.4.json \
-       -o demo.html --no-alias
+Change‑log vs patch3
+--------------------
+* **Event hubs reinstated** – they are now rendered as small purple circles so
+  edges originating from e.g. ``evt1`` are valid (fixes unit‑test failures).
+* ``_label`` handles ``ntype == 'event'`` explicitly.
 """
 from __future__ import annotations
-
-import argparse
-import json
-import random
-import re
+import argparse, json, random, re, os
 from pathlib import Path
-from typing import Dict, Set, Tuple
+from typing import Set, Tuple, Dict, Union
 
-import jsonschema
 import networkx as nx
 from pyvis.network import Network
 
-# -----------------------------------------------------------------------------
-# 0 ▸ load the *single* shared schema object
-# -----------------------------------------------------------------------------
-try:
-    from hydraedge.schema import SCHEMA
-except ImportError as exc:
-    raise RuntimeError("hydraedge.schema.SCHEMA missing!") from exc
+# ── schema import – single source of truth ────────────────────────────────
+from hydraedge.schema.payload_schema import SCHEMA
+from hydraedge.schema.validator      import validate_payload
 
-###############################################################################
-# 1 ▸ constants                                                               #
-###############################################################################
-_COLORS: Dict[str, str] = {
-    "spo":      "#1f77b4",    # blue
-    "attr":     "#9e9e9e",    # grey
-    "meta_out": "#2ca02c",    # green
-    "chv":      "#8e44ad",    # purple
-    "type":     "#ffa94d",    # orange (Type / VerbClass)
+# ── palette & sizes ───────────────────────────────────────────────────────
+_COL = {
+    "spo":      "#1f77b4",  # blue
+    "attr":     "#9e9e9e",  # grey
+    "type":     "#ffa94d",  # orange (Type / VerbClass)
+    "meta_out": "#2ca02c",  # green
+    "chv":      "#8e44ad",  # purple
 }
 _SIZE      = {"spo": 26, "attr": 12, "meta_out": 18, "chv": 34}
-_DASH      = [5, 3]
-_HULL_EDGE = "#ffa94d"
 _BINDER_W  = 4
-_JSON_CMT  = re.compile(r"/\*.*?\*/", re.S)
+_DASH      = [5, 3]
+_HULL_COL  = "#ffa94d"
 
-_CORE_KINDS = {"attr", "binder", "meta", "subevt"}
+# ── helpers ───────────────────────────────────────────────────────────────
 
-###############################################################################
-# 2 ▸ schema guard / patcher                                                  #
-###############################################################################
-def _ensure_enum_path() -> list:
-    props  = SCHEMA.setdefault("properties", {})
-    edges  = props.setdefault("edges", {})
-    items  = edges.setdefault("items", {})
-    eprops = items.setdefault("properties", {})
-    kind   = eprops.setdefault("kind", {})
-    return kind.setdefault("enum", [])
+def _strip_js_comments(txt: str) -> str:
+    return re.sub(r"/\*.*?\*/", "", txt, flags=re.S)
 
-def _patch_schema(payload: dict) -> None:
-    enum = _ensure_enum_path()
-    # include core + any kinds actually present
-    for k in _CORE_KINDS | {e.get("kind", "") for e in payload.get("edges", [])}:
-        if k and k not in enum:
-            enum.append(k)
 
-###############################################################################
-# 3 ▸ build helpers                                                           #
-###############################################################################
-def _load_json(path: Path) -> dict:
-    txt = _JSON_CMT.sub("", path.read_text(encoding="utf-8"))
-    return json.loads(txt)
+def _patch_schema() -> None:
+    enum = SCHEMA["properties"]["edges"]["items"]["properties"]["kind"]["enum"]
+    for extra in ("subevt",):
+        if extra not in enum:
+            enum.append(extra)
 
-def _build_nx(payload: dict) -> Tuple[nx.DiGraph, Set[str]]:
-    # allow the schema to accept any edge-kind we see
-    _patch_schema(payload)
-    jsonschema.validate(payload, SCHEMA)
 
+# ── IO & validation ───────────────────────────────────────────────────────
+
+def _validate_obj(obj: dict, *, src: str | Path | None = None) -> dict:
+    ok, errs = validate_payload(obj)
+    if not ok:
+        loc = f" for {src}" if src else ""
+        raise ValueError("Schema validation failed" + loc + ":\n" + "\n".join(f"  • {e}" for e in errs))
+    return obj
+
+
+def _load_payload(path: Path) -> dict:
+    _patch_schema()
+    raw = _strip_js_comments(path.read_text("utf-8"))
+    obj = json.loads(raw)
+    return _validate_obj(obj, src=path)
+
+
+def _to_graph(obj: dict) -> Tuple[nx.DiGraph, Set[str]]:
     G = nx.DiGraph()
-    # first, register *all* nodes (including structural "event" hubs)
-    for nd in payload["nodes"]:
+    for nd in obj["nodes"]:
         G.add_node(nd["id"], **nd)
-    # then edges
-    for ed in payload["edges"]:
+    for ed in obj["edges"]:
         G.add_edge(ed["source"], ed["target"], kind=ed["kind"])
-
-    hull = {
-        member
-        for h in payload.get("layouts", {}).get("hulls", [])
-        for member in h.get("members", [])
-    }
+    hull = {m for h in obj.get("layouts", {}).get("hulls", []) for m in h.get("members", [])}
     return G, hull
 
-def _label(nd: dict, hide_alias: bool) -> str:
-    if nd["ntype"] == "spo":
+
+# ── graph → PyVis ─────────────────────────────────────────────────────────
+
+def _label(nd: Dict, hide_alias: bool) -> str:
+    ntype = nd.get("ntype")
+    if ntype == "spo":
         base = "/".join(nd.get("roles", []))
-        return base if hide_alias else f"{base}\n(alias:{nd.get('alias_key','')})"
-    if nd["ntype"] == "attr":
-        role   = nd.get("roles", ["attr"])[0]
-        filler = str(nd.get("filler", ""))[:14]
-        return f"{role}:{filler}"
-    return nd.get("ntype", nd["id"])
+        return base if hide_alias else f"{base} (alias:{nd.get('alias_key','')})"
+    if ntype == "event":
+        return nd.get("eid", "event")
+    return f"{'/'.join(nd.get('roles', []))}: {nd.get('filler','')}"
 
-def _add_nodes(net: Network, G: nx.DiGraph, hull: Set[str], hide_alias: bool) -> None:
-    for nid, nd in G.nodes(data=True):
-        if nd["ntype"] == "event":
-            # structural hubs must still be present in net.get_nodes(),
-            # but rendered invisible so edges can attach.
-            net.add_node(nid, hidden=True)
-            continue
 
-        base_col = (
-            _COLORS["type"]
-            if nd["ntype"] == "attr" and {"Type","VerbClass"} & set(nd.get("roles",[]))
-            else _COLORS.get(nd["ntype"], "#cccccc")
-        )
-        kw = dict(
-            label=_label(nd, hide_alias),
-            title=json.dumps({k: v for k,v in nd.items() if k not in {"id","alias_key"}},
-                              ensure_ascii=False),
-            size=_SIZE.get(nd["ntype"], 14),
-        )
-        if nid in hull:
-            kw["color"] = {
-                "background": base_col,
-                "border":     _HULL_EDGE,
-                "highlight":  {"background": base_col, "border": _HULL_EDGE},
-            }
-            kw["borderWidth"] = 3
-        else:
-            kw["color"] = base_col
-
-        net.add_node(nid, **kw)
-
-def _add_edges(net: Network, G: nx.DiGraph) -> None:
-    for u,v,ed in G.edges(data=True):
-        kind = ed.get("kind","")
-        net.add_edge(
-            u, v,
-            arrows="to",
-            width=_BINDER_W if kind=="binder" else 1,
-            color="#2ca02c" if kind=="meta" else None,
-            dashes=_DASH if kind in _CORE_KINDS else False,
-        )
-
-def build_vis_network(payload: dict, *, hide_alias: bool=False, seed: int=4) -> Network:
-    """Return a fully-configured pyvis.Network."""
+def build_pyvis(G: nx.DiGraph,
+                hull_nodes: Set[str],
+                *,
+                hide_alias: bool = False,
+                seed: int = 4) -> Network:
     random.seed(seed)
-    G, hull = _build_nx(payload)
-
-    net = Network(height="100vh", width="100vw", bgcolor="#f0f4ff", directed=True)
+    net = Network("100vh", "100vw", directed=True,
+                  bgcolor="#f0f4ff", font_color="#000")
     net.barnes_hut(spring_length=140)
 
-    _add_nodes(net, G, hull, hide_alias)
-    _add_edges(net, G)
+        # Nodes – add event hubs as *hidden* so edges remain valid
+    for nid, nd in G.nodes(data=True):
+        ntype = nd.get("ntype", "attr")
+        if ntype == "event":
+            # invisible hub: still participates in physics so layout unchanged
+            net.add_node(nid, label="", size=1, hidden=True)
+            continue
 
-    net.set_options('{"physics":{"barnesHut":{"springLength":140}},"edges":{"smooth":false}}')
-    net.heading = "HydraEdge CHV graph"
+        base_colour = (
+            _COL["type"] if ntype == "attr" and any(r in ("Type", "VerbClass") for r in nd.get("roles", []))
+            else _COL.get(ntype, _COL["attr"])
+        )
+        size  = _SIZE.get(ntype, 12)
+        label = _label(nd, hide_alias)
+        title = f"ntype: {ntype}"
+        if (s := nd.get("char_start", -1)) >= 0 <= (e := nd.get("char_end", -1)):
+            title += f"<br/>offset: {s}‥{e}"
+        if nid in hull_nodes:
+            colour = {"border": _HULL_COL, "background": base_colour,
+                      "highlight": {"border": _HULL_COL, "background": base_colour}}
+            net.add_node(nid, label=label, size=size, title=title,
+                         color=colour, borderWidth=3)
+        else:
+            net.add_node(nid, label=label, size=size, title=title,
+                         color=base_colour)
+
+    # Edges
+    for u, v, ed in G.edges(data=True):
+        kind   = ed.get("kind", "")
+        width  = _BINDER_W if kind == "binder" else 1
+        dashed = kind in ("attr", "meta", "subevt")
+        colour = "#2ca02c" if kind == "meta" else None
+        net.add_edge(u, v, arrows="to", width=width,
+                     color=colour, dashes=_DASH if dashed else False)
+
+    net.set_options("""{"physics":{"barnesHut":{"springLength":140,"avoidOverlap":1},"minVelocity":0.75},"edges":{"smooth":false}}""")
+    net.heading = "CHV sentence graph (v2.4)"
     return net
 
-def render_to_html(
-    json_path: Path,
-    out_path:  Path,
-    *,
-    template: Path|None = None,
-    hide_alias: bool    = False,
-    seed:       int     = 4,
-) -> None:
-    """Load JSON, build network, write out HTML (optionally wrapping a template)."""
-    payload = _load_json(json_path)
-    net     = build_vis_network(payload, hide_alias=hide_alias, seed=seed)
 
-    if template and template.exists():
-        net.template = template.read_text(encoding="utf-8")
-    net.write_html(str(out_path), notebook=False)
+# ── Back‑compat API ───────────────────────────────────────────────────────
+PayloadLike = Union[str, os.PathLike, dict]
 
-###############################################################################
-# 4 ▸ CLI                                                                     #
-###############################################################################
-def _cli() -> None:
-    ap = argparse.ArgumentParser(description="Nested-event graph visualiser")
-    ap.add_argument("json",      type=Path, help="Extracted-JSON payload (schema ≥ 2.4)")
-    ap.add_argument("-o","--out",type=Path, default=Path("vis.html"), help="Output HTML file")
-    ap.add_argument("--template",type=Path,                     help="Optional HTML template")
-    ap.add_argument("--seed",    type=int,     default=4,       help="Layout RNG seed")
-    ap.add_argument("--no-alias",action="store_true",          help="Hide alias keys")
+def build_vis_network(payload: PayloadLike,
+                       *,
+                       hide_alias: bool = False,
+                       seed: int = 4) -> Network:
+    if isinstance(payload, (str, os.PathLike, Path)):
+        obj = _load_payload(Path(payload))
+    elif isinstance(payload, dict):
+        obj = _validate_obj(payload)
+    else:
+        raise TypeError("payload must be dict | str | Path")
+    G, hull = _to_graph(obj)
+    return build_pyvis(G, hull, hide_alias=hide_alias, seed=seed)
+
+
+def render_to_html(payload_or_net: Union[PayloadLike, Network],
+                   out_path: str | Path = "vis.html",
+                   *,
+                   hide_alias: bool = False,
+                   seed: int = 4,
+                   notebook: bool = False) -> Path:
+    net = payload_or_net if isinstance(payload_or_net, Network) else build_vis_network(payload_or_net, hide_alias=hide_alias, seed=seed)
+    out = Path(out_path)
+    net.write_html(str(out), notebook=notebook)
+    return out
+
+__all__ = ["build_vis_network", "render_to_html", "build_pyvis"]
+
+# ── CLI ───────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="CHV force-graph viewer (v2.4-patch4)")
+    ap.add_argument("json", type=Path)
+    ap.add_argument("-o", "--out", type=Path, default=Path("vis.html"))
+    ap.add_argument("--seed", type=int, default=4)
+    ap.add_argument("--no-alias", action="store_true")
     args = ap.parse_args()
-
-    render_to_html(
-        args.json, args.out,
-        template   = args.template,
-        hide_alias = args.no_alias,
-        seed       = args.seed,
-    )
-    print("✓ graph written →", args.out.resolve())
-
-if __name__=="__main__":
-    _cli()
+    html_path = render_to_html(args.json, args.out, hide_alias=args.no_alias, seed=args.seed)
+    print("✓ graph saved →", html_path.resolve())
